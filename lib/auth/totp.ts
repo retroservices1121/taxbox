@@ -1,0 +1,5 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+const A="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+function decode(s:string){s=s.toUpperCase().replace(/[\s=-]/g,"");let bits=0,value=0;const out:number[]=[];for(const c of s){const i=A.indexOf(c);if(i<0)throw new Error("Invalid TOTP secret");value=(value<<5)|i;bits+=5;if(bits>=8){out.push((value>>>(bits-8))&255);bits-=8;}}return Buffer.from(out);}
+function hotp(secret:Buffer,counter:number){const msg=Buffer.alloc(8);msg.writeUInt32BE(Math.floor(counter/2**32),0);msg.writeUInt32BE(counter>>>0,4);const d=createHmac("sha1",secret).update(msg).digest(),o=d[d.length-1]!&15,n=((d[o]!&127)<<24)|(d[o+1]!<<16)|(d[o+2]!<<8)|d[o+3]!;return String(n%1_000_000).padStart(6,"0");}
+export function verifyTotp(secret:string,code:string,last:number|null){const clean=code.replace(/\s/g,"");if(!/^\d{6}$/.test(clean))return{valid:false};const now=Math.floor(Date.now()/30000),key=decode(secret);for(let d=-1;d<=1;d++){const c=now+d;if(last!=null&&c<=last)continue;const a=Buffer.from(hotp(key,c)),b=Buffer.from(clean);if(timingSafeEqual(a,b))return{valid:true,counter:c};}return{valid:false};}
