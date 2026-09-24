@@ -1,13 +1,15 @@
 "use server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { resolveStaffSession, SESSION_COOKIE } from "@/lib/auth/staff-auth";
 import { clients, workspaces } from "@/lib/db/schema";
 import { withFirmScope } from "@/lib/db/scoped";
 
 export async function createTaxBox(formData:FormData){
  const store=await cookies();
- const firmId=store.get("taxbox_dev_firm")?.value;
- if(!firmId) redirect("/login");
+ const session=await resolveStaffSession(store.get(SESSION_COOKIE)?.value);
+ if(!session) redirect("/login");
+ const firmId=session.firmId;
  const name=String(formData.get("name")??"").trim();
  const email=String(formData.get("email")??"").trim().toLowerCase();
  const type=String(formData.get("type"))==="BUSINESS"?"BUSINESS":"INDIVIDUAL";
