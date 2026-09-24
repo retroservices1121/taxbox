@@ -1,0 +1,4 @@
+"use client";
+import { useActionState } from "react";
+import { loginAction } from "./actions";
+export default function LoginForm(){const [s,a,p]=useActionState(loginAction,{error:""});return <form action={a} className="mt-7 space-y-4">{s.error?<div className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{s.error}</div>:null}<label className="block text-sm font-medium">Email<input name="email" type="email" autoComplete="username" required className="mt-1 w-full rounded-lg border px-3 py-3"/></label><label className="block text-sm font-medium">Password<input name="password" type="password" autoComplete="current-password" required className="mt-1 w-full rounded-lg border px-3 py-3"/></label><button disabled={p} className="w-full rounded-lg bg-neutral-950 px-4 py-3 font-medium text-white">{p?"Signing in…":"Continue"}</button></form>;}
