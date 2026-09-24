@@ -13,9 +13,6 @@ export default function HomePage() {
           <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-300">
             TaxBox helps accounting firms collect, organize, request, and track client tax documents before preparation begins.
           </p>
-          <div className="mt-8">
-              <Link href="/login" className="inline-flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-medium text-black sm:w-auto">Log in to TaxBox</Link>
-            </div>
         </div>
         </div>
       </div>
