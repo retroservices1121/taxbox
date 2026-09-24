@@ -1,11 +1,13 @@
 -- TaxBox tenant isolation baseline.
 -- Run as the database owner via ADMIN_DATABASE_URL.
--- The application role must NOT own these tables and must NOT have BYPASSRLS.
+-- The application executes tenant queries with SET LOCAL ROLE app_firm.
 
 DO $$ BEGIN
   CREATE ROLE app_firm NOLOGIN;
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+
+GRANT app_firm TO CURRENT_USER;
 
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clients FORCE ROW LEVEL SECURITY;
@@ -57,5 +59,6 @@ CREATE POLICY audit_firm_isolation ON audit_events
   USING (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid)
   WITH CHECK (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid);
 
+GRANT USAGE ON SCHEMA public TO app_firm;
 GRANT SELECT, INSERT, UPDATE, DELETE ON clients, workspaces, checklist_items, documents, invites, document_requests TO app_firm;
 GRANT SELECT, INSERT ON audit_events TO app_firm;
