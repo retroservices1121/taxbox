@@ -23,6 +23,8 @@ ALTER TABLE document_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_requests FORCE ROW LEVEL SECURITY;
 ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_events FORCE ROW LEVEL SECURITY;
+ALTER TABLE staff_invites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE staff_invites FORCE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS clients_firm_isolation ON clients;
 CREATE POLICY clients_firm_isolation ON clients
@@ -54,11 +56,16 @@ CREATE POLICY requests_firm_isolation ON document_requests
   USING (EXISTS (SELECT 1 FROM workspaces w WHERE w.id = document_requests.workspace_id))
   WITH CHECK (EXISTS (SELECT 1 FROM workspaces w WHERE w.id = document_requests.workspace_id));
 
+DROP POLICY IF EXISTS staff_invites_firm_isolation ON staff_invites;
+CREATE POLICY staff_invites_firm_isolation ON staff_invites
+  USING (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid)
+  WITH CHECK (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid);
+
 DROP POLICY IF EXISTS audit_firm_isolation ON audit_events;
 CREATE POLICY audit_firm_isolation ON audit_events
   USING (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid)
   WITH CHECK (firm_id = NULLIF(current_setting('app.firm_id', true), '')::uuid);
 
 GRANT USAGE ON SCHEMA public TO app_firm;
-GRANT SELECT, INSERT, UPDATE, DELETE ON clients, workspaces, checklist_items, documents, invites, document_requests TO app_firm;
+GRANT SELECT, INSERT, UPDATE, DELETE ON clients, workspaces, checklist_items, documents, invites, document_requests, staff_invites TO app_firm;
 GRANT SELECT, INSERT ON audit_events TO app_firm;
