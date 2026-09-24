@@ -9,7 +9,7 @@ import { resolveStaffSession, SESSION_COOKIE } from "@/lib/auth/staff-auth";
 
 const hash=(s:string)=>createHash("sha256").update(s).digest("hex");
 
-export async function inviteStaff(_prev:{error?:string;inviteUrl?:string},formData:FormData){
+export async function inviteStaff(_prev:{error?:string;inviteUrl?:string},formData:FormData):Promise<{error?:string;inviteUrl?:string}>{
  const session=await resolveStaffSession((await cookies()).get(SESSION_COOKIE)?.value);
  if(!session) redirect("/login");
  if(session.role!=="FIRM_ADMIN") return {error:"Only Firm Admins can invite staff."};
