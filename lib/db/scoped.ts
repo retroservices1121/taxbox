@@ -1,5 +1,6 @@
 import "server-only";
 import postgres from "postgres";
+import { sql as drizzleSql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
 
@@ -12,17 +13,17 @@ export async function withFirmScope<T>(
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is required at runtime");
 
-  const sql = postgres(url, { max: 1, prepare: false });
-  const db = drizzle(sql, { schema });
+  const client = postgres(url, { max: 1, prepare: false });
+  const db = drizzle(client, { schema });
 
   try {
     return await db.transaction(async tx => {
       await tx.execute(
-        sql`select set_config('app.firm_id', ${firmId}, true)`
+        drizzleSql`select set_config('app.firm_id', ${firmId}, true)`
       );
       return await fn(tx as unknown as ScopedDb);
     });
   } finally {
-    await sql.end();
+    await client.end();
   }
 }
