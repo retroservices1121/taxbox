@@ -9,3 +9,4 @@ export * from "./invites";
 export * from "./requests";
 export * from "./audit";
 export * from "./auth";
+export * from "./staff-invites";
