@@ -6,7 +6,7 @@ import { db } from "@/lib/db/client";
 import { checklistItems, clients, documents, firms, invites, workspaces } from "@/lib/db/schema";
 import { buildBusinessChecklist, buildIndividualChecklist } from "@/lib/checklists";
 import { processTaxDocumentUpload } from "@/lib/documents/upload";
-import { mockDocumentIntelligence } from "@/lib/document-intelligence/mock";
+import { getDocumentIntelligenceProvider } from "@/lib/document-intelligence/openai";
 
 const hash=(s:string)=>createHash("sha256").update(s).digest("hex");
 
@@ -52,7 +52,7 @@ export async function uploadClientDocument(_prev:{error?:string;ok?:boolean;mess
   const token=String(formData.get("token")??""); const ctx=await resolveClient(token);
   const file=formData.get("file"); if(!(file instanceof File)||file.size===0)return {error:"Choose a document to upload."};
   const bytes=Buffer.from(await file.arrayBuffer());
-  const uploaded=await processTaxDocumentUpload({firmId:ctx.firmId,workspaceId:ctx.workspaceId,expectedTaxYear:ctx.year,fileName:file.name,mimeType:file.type,bytes,intelligence:mockDocumentIntelligence});
+  const uploaded=await processTaxDocumentUpload({firmId:ctx.firmId,workspaceId:ctx.workspaceId,expectedTaxYear:ctx.year,fileName:file.name,mimeType:file.type,bytes,intelligence:getDocumentIntelligenceProvider()});
   const cl=uploaded.classification;
   const [doc]=await db.insert(documents).values({
    workspaceId:ctx.workspaceId,storageKey:uploaded.objectKey,originalFileName:file.name,displayName:cl.suggestedDisplayName,
