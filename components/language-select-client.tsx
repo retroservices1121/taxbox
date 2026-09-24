@@ -1,9 +1,10 @@
 "use client";
 import { useRef } from "react";
+import { setLanguage } from "@/app/language/actions";
 
 export function LanguageSelectClient({locale}:{locale:"en"|"es"}){
  const formRef=useRef<HTMLFormElement>(null);
- return <form ref={formRef} action="/language" method="post">
+ return <form ref={formRef} action={setLanguage}>
   <select
    name="locale"
    defaultValue={locale}
