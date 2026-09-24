@@ -18,6 +18,7 @@ export async function withFirmScope<T>(
 
   try {
     return await db.transaction(async tx => {
+      await tx.execute(drizzleSql.raw("set local role app_firm"));
       await tx.execute(
         drizzleSql`select set_config('app.firm_id', ${firmId}, true)`
       );
