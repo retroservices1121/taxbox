@@ -7,7 +7,7 @@ import { hashPassword } from "@/lib/security/password";
 import { encryptTotpSecret } from "@/lib/security/totp-secret";
 import { generateTotpSecret, totpUri } from "@/lib/auth/totp";
 const hash=(s:string)=>createHash("sha256").update(s).digest("hex");
-export async function acceptStaffInvite(_prev:{error?:string;ok?:boolean;secret?:string;uri?:string},formData:FormData){
+export async function acceptStaffInvite(_prev:{error?:string;ok?:boolean;secret?:string;uri?:string},formData:FormData):Promise<{error?:string;ok?:boolean;secret?:string;uri?:string}>{
  const token=String(formData.get("token")??""); const name=String(formData.get("name")??"").trim(); const password=String(formData.get("password")??"");
  if(!token||!name||password.length<12)return{error:"Enter your name and a password of at least 12 characters."};
  const [invite]=await db.select().from(staffInvites).where(and(eq(staffInvites.tokenHash,hash(token)),eq(staffInvites.status,"PENDING"),gt(staffInvites.expiresAt,new Date()))).limit(1);
