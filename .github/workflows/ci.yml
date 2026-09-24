@@ -8,15 +8,31 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: taxbox
+          POSTGRES_PASSWORD: taxbox
+          POSTGRES_DB: taxbox_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U taxbox -d taxbox_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://taxbox:taxbox@localhost:5432/taxbox_test
+      ADMIN_DATABASE_URL: postgresql://taxbox:taxbox@localhost:5432/taxbox_test
+      RLS_TEST_DATABASE_URL: postgresql://taxbox:taxbox@localhost:5432/taxbox_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - run: npm install
+      - run: npm run db:migrate
       - run: npm run typecheck
+      - run: npm test
       - run: npm run build
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-          ADMIN_DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
