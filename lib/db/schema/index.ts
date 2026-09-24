@@ -1,6 +1,7 @@
 export * from "./_shared";
 export * from "./enums";
 export * from "./firms";
+export * from "./auth";
 export * from "./clients";
 export * from "./workspaces";
 export * from "./checklists";
