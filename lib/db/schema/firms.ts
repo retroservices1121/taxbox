@@ -22,7 +22,10 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   role: userRole("role").notNull(),
   passwordHash: text("password_hash"),
-  totpSecretEnc: text("totp_secret_enc"),\n  totpLastCounter: integer("totp_last_counter"),\n  failedLoginCount: integer("failed_login_count").notNull().default(0),\n  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  totpSecretEnc: text("totp_secret_enc"),
+  totpLastCounter: integer("totp_last_counter"),
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   status: accountStatus("status").notNull().default("ACTIVE"),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   ...timestamps
