@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { resolveStaffSession, SESSION_COOKIE } from "@/lib/auth/staff-auth";
 import { getFirmDashboard } from "@/lib/firm/dashboard";
+import { logoutAction } from "./logout";
 
 export const dynamic="force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function FirmPage(){
  const missing=counts.MISSING_ITEMS??0;
  const notStarted=counts.NOT_STARTED??0;
  return <main className="min-h-screen bg-neutral-100">
-  <header className="border-b bg-white"><div className="mx-auto max-w-7xl px-6 py-4"><div className="text-xl font-semibold">TaxBox</div><div className="text-sm text-neutral-500">Firm dashboard · 2026</div></div></header>
+  <header className="border-b bg-white"><div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4"><div><div className="text-xl font-semibold">TaxBox</div><div className="text-sm text-neutral-500">Firm dashboard · 2026</div></div><form action={logoutAction}><button className="rounded-lg border px-3 py-2 text-sm font-medium">Log out</button></form></div></header>
   <div className="mx-auto max-w-7xl px-6 py-8">
    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[["TaxBoxes",total],["Ready",ready],["Missing Items",missing],["Not Started",notStarted]].map(([l,v])=><div key={l} className="rounded-xl border bg-white p-5"><div className="text-sm text-neutral-500">{l}</div><div className="mt-2 text-3xl font-semibold">{v}</div></div>)}</div>
    <section className="mt-8 overflow-hidden rounded-xl border bg-white">
