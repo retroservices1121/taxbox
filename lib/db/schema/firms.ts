@@ -1,6 +1,6 @@
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { accountStatus, userRole } from "./enums";
-import { timestamps, uuidPk } from "./_shared";
+import { bytea, timestamps, uuidPk } from "./_shared";
 
 export const firms = pgTable("firms", {
   id: uuidPk(),
@@ -8,6 +8,9 @@ export const firms = pgTable("firms", {
   slug: text("slug").notNull().unique(),
   logoUrl: text("logo_url"),
   contactEmail: text("contact_email"),
+  dekCiphertext: bytea("dek_ciphertext"),
+  dekKeyId: text("dek_key_id"),
+  dekDestroyedAt: timestamp("dek_destroyed_at", { withTimezone: true }),
   status: accountStatus("status").notNull().default("ACTIVE"),
   ...timestamps
 });
