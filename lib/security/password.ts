@@ -1,0 +1,4 @@
+import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+const N=16384,R=8,P=1,SALT=16,KEY=64;
+export function hashPassword(password:string){const salt=randomBytes(SALT);const key=scryptSync(password.normalize("NFKC"),salt,KEY,{N,r:R,p:P});return ["scrypt",`N=${N},r=${R},p=${P}`,salt.toString("base64"),key.toString("base64")].join("$");}
+export function verifyPassword(password:string,encoded:string|null){if(!encoded){scryptSync(password.normalize("NFKC"),Buffer.alloc(SALT),KEY,{N,r:R,p:P});return false;}const parts=encoded.split("$");const m=/^N=(\d+),r=(\d+),p=(\d+)$/.exec(parts[1]??"");if(parts.length!==4||parts[0]!=="scrypt"||!m)return false;const salt=Buffer.from(parts[2]!,"base64"),expected=Buffer.from(parts[3]!,"base64");const actual=scryptSync(password.normalize("NFKC"),salt,expected.length,{N:Number(m[1]),r:Number(m[2]),p:Number(m[3])});return actual.length===expected.length&&timingSafeEqual(actual,expected);}
