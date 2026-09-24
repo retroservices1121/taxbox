@@ -3,10 +3,10 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DO $$ BEGIN CREATE TYPE user_role AS ENUM ('PLATFORM_ADMIN','FIRM_ADMIN','PREPARER'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE account_status AS ENUM ('ACTIVE','SUSPENDED'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE client_type AS ENUM ('INDIVIDUAL','BUSINESS'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-DO $ BEGIN CREATE TYPE workspace_status AS ENUM ('NOT_STARTED','COLLECTING','MISSING_ITEMS','READY_FOR_PREPARATION','IN_PREPARATION','ADDITIONAL_INFO_REQUESTED','READY_TO_FILE','FILED','ARCHIVED'); EXCEPTION WHEN duplicate_object THEN NULL; END $;
-DO $ BEGIN CREATE TYPE checklist_status AS ENUM ('EXPECTED','RECEIVED','NOT_APPLICABLE','REQUESTED','REVIEW_REQUIRED'); EXCEPTION WHEN duplicate_object THEN NULL; END $;
+DO $tag$ BEGIN CREATE TYPE workspace_status AS ENUM ('NOT_STARTED','COLLECTING','MISSING_ITEMS','READY_FOR_PREPARATION','IN_PREPARATION','ADDITIONAL_INFO_REQUESTED','READY_TO_FILE','FILED','ARCHIVED'); EXCEPTION WHEN duplicate_object THEN NULL; END $tag$;
+DO $tag$ BEGIN CREATE TYPE checklist_status AS ENUM ('EXPECTED','RECEIVED','NOT_APPLICABLE','REQUESTED','REVIEW_REQUIRED'); EXCEPTION WHEN duplicate_object THEN NULL; END $tag$;
 DO $$ BEGIN CREATE TYPE invite_status AS ENUM ('PENDING','OPENED','COMPLETED','EXPIRED','REVOKED'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-DO $ BEGIN CREATE TYPE document_review_status AS ENUM ('AUTO_MATCHED','REVIEW_REQUIRED','CONFIRMED','REJECTED'); EXCEPTION WHEN duplicate_object THEN NULL; END $;
+DO $tag$ BEGIN CREATE TYPE document_review_status AS ENUM ('AUTO_MATCHED','REVIEW_REQUIRED','CONFIRMED','REJECTED'); EXCEPTION WHEN duplicate_object THEN NULL; END $tag$;
 
 CREATE TABLE IF NOT EXISTS firms(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),name text NOT NULL,slug text NOT NULL UNIQUE,logo_url text,contact_email text,dek_ciphertext bytea,dek_key_id text,dek_destroyed_at timestamptz,status account_status NOT NULL DEFAULT 'ACTIVE',created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS users(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),firm_id uuid REFERENCES firms(id) ON DELETE CASCADE,email text NOT NULL UNIQUE,name text NOT NULL,role user_role NOT NULL,password_hash text,totp_secret_enc text,totp_last_counter integer,failed_login_count integer NOT NULL DEFAULT 0,locked_until timestamptz,status account_status NOT NULL DEFAULT 'ACTIVE',last_login_at timestamptz,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
