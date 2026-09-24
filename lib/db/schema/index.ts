@@ -8,3 +8,4 @@ export * from "./documents";
 export * from "./invites";
 export * from "./requests";
 export * from "./audit";
+\nexport * from "./auth";\n
