@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { accountStatus, userRole } from "./enums";
 import { bytea, timestamps, uuidPk } from "./_shared";
 
@@ -22,7 +22,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   role: userRole("role").notNull(),
   passwordHash: text("password_hash"),
-  totpSecretEnc: text("totp_secret_enc"),
+  totpSecretEnc: text("totp_secret_enc"),\n  totpLastCounter: integer("totp_last_counter"),\n  failedLoginCount: integer("failed_login_count").notNull().default(0),\n  lockedUntil: timestamp("locked_until", { withTimezone: true }),
   status: accountStatus("status").notNull().default("ACTIVE"),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   ...timestamps
