@@ -4,7 +4,7 @@ import { firms, users } from "@/lib/db/schema";
 import { hashPassword } from "@/lib/security/password";
 import { generateTotpSecret, totpUri } from "@/lib/auth/totp";
 
-export async function setupFirmAdmin(form:FormData){
+export async function setupFirmAdmin(_previousState:{error?:string;ok?:boolean;secret?:string;uri?:string},form:FormData){
  if(process.env.ALLOW_INITIAL_SETUP!=="true")return{error:"Initial setup is disabled."};
  const firmName=String(form.get("firmName")??"").trim(),name=String(form.get("name")??"").trim(),email=String(form.get("email")??"").trim().toLowerCase(),password=String(form.get("password")??"");
  if(!firmName||!name||!email||password.length<12)return{error:"Complete all fields. Password must be at least 12 characters."};
