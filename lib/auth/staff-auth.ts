@@ -41,3 +41,5 @@ export async function resolveStaffSession(raw:string|undefined,ctx:Ctx={}){
  await db.update(staffSessions).set({lastSeenAt:now,expiresAt:new Date(Math.min(now.getTime()+IDLE,r.absolute.getTime()))}).where(eq(staffSessions.id,r.sid));
  return{kind:"staff" as const,userId:r.uid,firmId:r.firmId,role:r.role==="FIRM_ADMIN"?"FIRM_ADMIN" as const:"PREPARER" as const,ip:ctx.ip,userAgent:ctx.userAgent};
 }
+
+export async function logout(raw:string|undefined){if(!raw)return;await db.update(staffSessions).set({revokedAt:new Date()}).where(eq(staffSessions.tokenHash,hash(raw)));}
