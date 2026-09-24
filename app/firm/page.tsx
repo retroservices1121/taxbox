@@ -1,13 +1,15 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { resolveStaffSession, SESSION_COOKIE } from "@/lib/auth/staff-auth";
 import { getFirmDashboard } from "@/lib/firm/dashboard";
 
 export const dynamic="force-dynamic";
 
 export default async function FirmPage(){
  const store=await cookies();
- const firmId=store.get("taxbox_dev_firm")?.value;
- if(!firmId) redirect("/login");
+ const session=await resolveStaffSession(store.get(SESSION_COOKIE)?.value);
+ if(!session) redirect("/login");
+ const firmId=session.firmId;
  const {rows,counts}=await getFirmDashboard(firmId,2026);
  const total=rows.length;
  const ready=counts.READY_FOR_PREPARATION??0;
