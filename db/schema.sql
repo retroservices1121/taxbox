@@ -31,3 +31,20 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_last_counter integer;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_login_count integer NOT NULL DEFAULT 0;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until timestamptz;
 ALTER TABLE staff_sessions ADD COLUMN IF NOT EXISTS totp_failures integer NOT NULL DEFAULT 0;
+
+
+CREATE TABLE IF NOT EXISTS staff_invites(
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ firm_id uuid NOT NULL REFERENCES firms(id) ON DELETE CASCADE,
+ email text NOT NULL,
+ role user_role NOT NULL DEFAULT 'PREPARER',
+ token_hash text NOT NULL UNIQUE,
+ status invite_status NOT NULL DEFAULT 'PENDING',
+ expires_at timestamptz NOT NULL,
+ invited_by_user_id uuid REFERENCES users(id) ON DELETE SET NULL,
+ completed_at timestamptz,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS staff_invites_firm_idx ON staff_invites(firm_id);
+CREATE INDEX IF NOT EXISTS staff_invites_email_idx ON staff_invites(email);
